@@ -43,13 +43,12 @@ jobs:
       - name: Build website
         run: npm run build
 
-      # Deploy to GitHub Pages using gh-pages branch
+      # Add built files directly to the repository
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          # The following lines assign commit authorship to the official GH-Actions bot
-          user_name: 'github-actions[bot]'
-          user_email: '41898282+github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Deploy to GitHub Pages'
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          cp -r build/* .
+          git add .
+          git commit -m "Deploy website - based on ${{ github.sha }}"
+          git push origin dev
