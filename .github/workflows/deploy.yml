@@ -15,6 +15,13 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: read    # Required for enterprise environments
+  security-events: write  # Required for enterprise security features
+
+# Environment configuration for enterprise deployment
+environment:
+  name: github-pages
+  url: ${{ steps.deployment.outputs.page_url }}
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -34,9 +41,13 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          registry-url: ${{ secrets.NPM_REGISTRY_URL || 'https://registry.npmjs.org' }}  # Support for private registry
 
       - name: Install dependencies
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  # For private package access if needed
+          # Add any additional enterprise environment variables here
       - name: Build website
         run: npm run build
 
